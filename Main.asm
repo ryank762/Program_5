@@ -18,8 +18,68 @@
 ; checking for start codon
 STATE_x
 	JSR	CHECK_SYMB
+	TRAP	x21
+	ADD	R1, R1, #0
+	BRnp	STATE_x		;loops unless x2600 contains A
+;
 STATE_A
-	HALT
+	JSR	CHECK_SYMB
+	TRAP	x21
+	ADD	R1, R1, #0
+	BRz	STATE_A		;returns to A if x2600 contains A
+	ADD	R1, R1, #-1
+	BRz	STATE_AU	;goes to AU if x2600 contains U
+	BR	STATE_x		;goes back to x if x2600 contains G,C
+;
+STATE_AU
+	JSR	CHECK_SYMB
+	TRAP	x21
+	ADD	R1, R1, #0
+	BRz	STATE_A		;goes back to A if x2600 contains A
+	ADD	R1, R1, #-2
+	BRz	STATE_AUG	;start codon AUG
+	BR	STATE_x		;goes back to x if x2600 contains U,C
+;
+STATE_AUG
+	LD	R0, PIPE
+	TRAP	x21		;prints pipe to console
+	JSR	CHECK_SYMB
+	TRAP	x21
+	ADD	R1, R1, #-1
+	BRnp	STATE_AUG	;loops unless x2600 contains A
+;
+STATE_AUG_U
+	JSR	CHECK_SYMB
+	TRAP	x21
+	ADD	R1, R1, #0
+	BRz	STATE_AUG_UA	;goes to AUG_UA if x2600 contains A
+	ADD	R1, R1, #-1
+	BRz	STATE_AUG_U	;goes to AUG_U	if x2600 contains U
+	ADD	R1, R1, #-1
+	BRz	STATE_AUG_UG	;goes to AUG_UG if x2600 contains G
+	BR	STATE_AUG	;returns to AUG if x2600 contains C
+;
+STATE_AUG_UA
+	JSR	CHECK_SYMB
+	TRAP	x21
+	ADD	R1, R1, #0
+	BRz	DONE		;stop codon UAA
+	ADD	R1, R1, #-1
+	BRz	STATE_AUG_U	;returns to AUG_U if x2600 contains U
+	ADD	R1, R1, #-1
+	BRz	DONE		;stop codon UAG
+	BR	STATE_AUG	;returns to AUG if x2600 contains C
+;
+STATE_AUG_UG
+	JSR	CHECK_SYMB
+	TRAP	x21
+	ADD	R1, R1, #0
+	BRz	DONE		;stop codon UGA
+	ADD	R1, R1, #-1
+	BRz	STATE_AUG_U	;returns to AUG_U if x2600 contains U
+	ADD	R1, R1, #-1
+	BR	STATE_AUG	;returns to AUG if x2600 ontains G,C
+DONE	HALT
 ;
 CHECK_SYMB
 ;
@@ -62,7 +122,6 @@ CHECK_C
 	ADD	R1, R1, #3
 ;
 CHECK_SYMB_DONE
-	
 ; restore regs
 	LD	R1, SAVER1
 	LD	R7, SAVER7
@@ -80,6 +139,7 @@ COMP_A	.FILL	x-41
 COMP_U	.FILL	x-75
 COMP_G	.FILL	x-47
 COMP_C	.FILL	x-43
+PIPE	.FILL	x7C
 ZERO	.FILL	x0000		;used to clear I/O registers
 SYMB	.FILL	x2600		;contains struck key if valid (checked by ISR)
 		.END
