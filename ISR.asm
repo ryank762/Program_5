@@ -1,6 +1,6 @@
 ; ISR.asm
-; Name: Ryan Junguk Kim
-; UTEid: jk39938
+; Name: Ryan Junguk Kim, James Lin
+; UTEid: jk39938, jl62356
 ; Keyboard ISR runs when a key is struck
 ; Checks for a valid RNA symbol and places it at x2600
                .ORIG x2500
