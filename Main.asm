@@ -37,12 +37,14 @@ STATE_AU
 	ADD	R1, R1, #0
 	BRz	STATE_A		;goes back to A if x2600 contains A
 	ADD	R1, R1, #-2
-	BRz	STATE_AUG	;start codon AUG
+	BRz	STATE_AUG_1	;start codon AUG
 	BR	STATE_x		;goes back to x if x2600 contains U,C
 ;
-STATE_AUG
+STATE_AUG_1
 	LD	R0, PIPE
 	TRAP	x21		;prints pipe to console
+	BR	STATE_AUG
+STATE_AUG
 	JSR	CHECK_SYMB
 	TRAP	x21
 	ADD	R1, R1, #-1
