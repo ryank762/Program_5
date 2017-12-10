@@ -1,6 +1,6 @@
 ; Main.asm
-; Name: Ryan Junguk Kim
-; UTEid: jk39938
+; Name: Ryan Junguk Kim, James Lin
+; UTEid: jk39938, jl62356
 ; Continuously reads from x2600 making sure its not reading duplicate
 ; symbols. Processes the symbol based on the program description
 ; of mRNA processing.
